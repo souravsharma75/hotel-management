@@ -5,14 +5,15 @@ import com.project.hotelmanagement.service.RoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/admin/rooms")
+@PreAuthorize("hasRole('HOTEL_MANAGER')")
 public class RoomController {
 
     private final RoomService roomService;

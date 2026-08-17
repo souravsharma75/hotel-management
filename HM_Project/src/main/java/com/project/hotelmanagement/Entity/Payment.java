@@ -1,6 +1,5 @@
 package com.project.hotelmanagement.Entity;
 
-import com.project.hotelmanagement.Entity.enums.PaymentMethod;
 import com.project.hotelmanagement.Entity.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -20,9 +19,6 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String transactionId;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentStatus paymentStatus;
@@ -37,7 +33,10 @@ public class Payment {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
-    @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod;
+    @Column(unique = true)
+    private String razorpayOrderId;
+
+    @Column(unique = true)
+    private String  razorpayPaymentId;
 
 }

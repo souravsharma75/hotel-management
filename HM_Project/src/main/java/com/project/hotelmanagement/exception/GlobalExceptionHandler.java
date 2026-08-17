@@ -1,6 +1,7 @@
 package com.project.hotelmanagement.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -47,7 +48,28 @@ public class GlobalExceptionHandler {
                         errors.put(
                                 error.getField(),
                                 error.getDefaultMessage()));
-
         return errors;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiErrorResponse handleAccessDeniedException(AccessDeniedException exception) {
+
+        return new ApiErrorResponse(
+                exception.getMessage(),
+                HttpStatus.FORBIDDEN.value(),
+                LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiErrorResponse handleIllegalStateException(IllegalStateException ex) {
+
+        return new ApiErrorResponse(
+                ex.getMessage(),
+                HttpStatus.CONFLICT.value(),
+                LocalDateTime.now()
+        );
     }
 }

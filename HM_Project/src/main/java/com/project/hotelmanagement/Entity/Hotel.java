@@ -1,5 +1,6 @@
 package com.project.hotelmanagement.Entity;
 
+import com.project.hotelmanagement.dto.RoomDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Setter

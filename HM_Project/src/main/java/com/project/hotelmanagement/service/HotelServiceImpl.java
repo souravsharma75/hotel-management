@@ -1,9 +1,13 @@
 package com.project.hotelmanagement.service;
 
 import com.project.hotelmanagement.Entity.Hotel;
+import com.project.hotelmanagement.Entity.Room;
 import com.project.hotelmanagement.dto.HotelDto;
+import com.project.hotelmanagement.dto.HotelInfoDto;
+import com.project.hotelmanagement.dto.RoomDto;
 import com.project.hotelmanagement.exception.ResourceNotFoundException;
 import com.project.hotelmanagement.repository.HotelRepository;
+import com.project.hotelmanagement.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -19,6 +23,8 @@ public class HotelServiceImpl implements HotelService {
     private final HotelRepository hotelRepository;
 
     private final ModelMapper modelMapper;
+
+    private final RoomRepository roomRepository;
 
     @Override
     public HotelDto createNewHotel(HotelDto hotelDto) {
@@ -114,4 +120,22 @@ public class HotelServiceImpl implements HotelService {
         return modelMapper.map(hotel, HotelDto.class);
     }
 
+
+    @Override
+    public HotelInfoDto getHotelInfoById(Long hotelId) {
+
+        log.info("Searching the hotel with Id {}",hotelId);
+
+        Hotel hotel = hotelRepository.findByIdAndActiveTrue(hotelId).orElseThrow(()->
+                new ResourceNotFoundException("Hotel not found with Id "+hotelId));
+
+        HotelDto hotelDto = modelMapper.map(hotel, HotelDto.class);
+
+        List<Room> rooms = roomRepository.findByHotel(hotel);
+
+        List<RoomDto> roomDto = rooms.stream().map(room ->
+                modelMapper.map(room, RoomDto.class)).toList();
+
+        return new HotelInfoDto(hotelDto, roomDto);
+    }
 }

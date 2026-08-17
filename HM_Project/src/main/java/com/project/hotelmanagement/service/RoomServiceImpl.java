@@ -2,7 +2,6 @@ package com.project.hotelmanagement.service;
 
 import com.project.hotelmanagement.Entity.Hotel;
 import com.project.hotelmanagement.Entity.Room;
-import com.project.hotelmanagement.dto.HotelDto;
 import com.project.hotelmanagement.dto.RoomDto;
 import com.project.hotelmanagement.exception.ResourceNotFoundException;
 import com.project.hotelmanagement.repository.HotelRepository;
@@ -11,15 +10,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class RoomServiceImpl implements RoomService {
-    private final RoomRepository roomRepository;
 
+    private final RoomRepository roomRepository;
     private final HotelRepository hotelRepository;
     private final ModelMapper modelMapper;
+    private final InventoryService inventoryService;
 
     @Override
     public RoomDto createRoom(Long hotelId, RoomDto roomDto) {
@@ -32,6 +33,13 @@ public class RoomServiceImpl implements RoomService {
         Room room = modelMapper.map(roomDto, Room.class);
         room.setHotel(hotel);
         room = roomRepository.save(room);
+
+
+        // initialize inventory
+        if (hotel.getActive()) {
+            inventoryService.initializeInventoryForAYear(room);
+        }
+
         return modelMapper.map(room,RoomDto.class);
 
     }
@@ -66,16 +74,18 @@ public class RoomServiceImpl implements RoomService {
         return modelMapper.map(updatedRoom,RoomDto.class);
     }
 
+    @Transactional
     @Override
     public String deleteRoomById(Long roomId) {
 
         Room room = roomRepository.findById(roomId).orElseThrow(()->
                 new ResourceNotFoundException("room not found with Id "+roomId));
 
+        // delete from inventory also
+        inventoryService.deleteInventoriesByRoom(room);
+
         roomRepository.delete(room);
 
         return "Room deleted successfully";
     }
-
-
 }
